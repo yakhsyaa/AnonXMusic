@@ -11,6 +11,12 @@ from youtubesearchpython.__future__ import VideosSearch
 from AnonXMusic.utils.database import is_on_off
 from AnonXMusic.utils.formatters import time_to_seconds
 
+def cookiefile():
+    cookie_dir = "cookies"
+    cookies_files = [f for f in os.listdir(cookie_dir) if f.endswith(".txt")]
+
+    cookie_file = os.path.join(cookie_dir, cookies_files[0])
+    return cookie_file
 
 async def shell_cmd(cmd):
     proc = await asyncio.create_subprocess_shell(
@@ -121,6 +127,8 @@ class YouTubeAPI:
             link = link.split("&")[0]
         proc = await asyncio.create_subprocess_exec(
             "yt-dlp",
+            "--cookies",
+            cookiefile(),
             "-g",
             "-f",
             "best[height<=?720][width<=?1280]",
@@ -169,6 +177,7 @@ class YouTubeAPI:
             "vidid": vidid,
             "duration_min": duration_min,
             "thumb": thumbnail,
+            "cookiefile": cookiefile(),
         }
         return track_details, vidid
 
@@ -204,6 +213,7 @@ class YouTubeAPI:
                             "ext": format["ext"],
                             "format_note": format["format_note"],
                             "yturl": link,
+                            "cookiefile": cookiefile(),
                         }
                     )
         return formats_available, link
@@ -243,6 +253,7 @@ class YouTubeAPI:
 
         def audio_dl():
             ydl_optssx = {
+                "cookiefile": cookiefile(),
                 "format": "bestaudio/best",
                 "outtmpl": "downloads/%(id)s.%(ext)s",
                 "geo_bypass": True,
@@ -260,6 +271,7 @@ class YouTubeAPI:
 
         def video_dl():
             ydl_optssx = {
+                "cookiefile": cookiefile(),
                 "format": "(bestvideo[height<=?720][width<=?1280][ext=mp4])+(bestaudio[ext=m4a])",
                 "outtmpl": "downloads/%(id)s.%(ext)s",
                 "geo_bypass": True,
@@ -285,6 +297,7 @@ class YouTubeAPI:
                 "nocheckcertificate": True,
                 "quiet": True,
                 "no_warnings": True,
+                "cookiefile": cookiefile(),
                 "prefer_ffmpeg": True,
                 "merge_output_format": "mp4",
             }
@@ -327,6 +340,8 @@ class YouTubeAPI:
             else:
                 proc = await asyncio.create_subprocess_exec(
                     "yt-dlp",
+                    "--cookies",
+                    cookiefile(),
                     "-g",
                     "-f",
                     "best[height<=?720][width<=?1280]",
